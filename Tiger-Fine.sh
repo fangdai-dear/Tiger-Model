@@ -2,7 +2,7 @@
 # export OUTPUT_DIR="/modelsaved/OUTPUT_DIR-Fine"
 # export DATASET="../dataset/training data/init_image"
 
-# CUDA_VISIBLE_DEVICES='0,1,2' accelerate launch --multi_gpu --num_processes=3 /export/home/daifang/Diffusion/own_code/train_controlnet_s.py \
+# CUDA_VISIBLE_DEVICES='0,1,2' accelerate launch --multi_gpu --num_processes=3 Tiger-Model/Fine-Training.py \
 #     --pretrained_model_name_or_path=$MODEL_DIR \
 #     --output_dir=$OUTPUT_DIR \
 #     --dataset_name=$DATASET \
