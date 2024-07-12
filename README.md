@@ -70,7 +70,7 @@ $ pip install -r requirements.txt
 Partial thyroid ultrasonography data used in this study are subject to privacy restrictions, but may be anonymized and made available upon reasonable request to the corresponding author.
 
 ## Training data preparation
-metadata.josnl\ 
+metadata.josnl: The file is placed under folder dataset/training data/init_image, each of which acts as the file name of the image, the associated condition file, and text information to facilitate the subsequent import of the model
 
 {"file_name": "20191101_094744_1.png", \
 "condition_nd": "../DATA/condition_nd/20191101_094744_1.png", \
@@ -94,6 +94,7 @@ conda install -c conda-forge diffusers
 ```sh
 conda list -e > requirements.txt
 ```
+## Stable Diffusion
 
 ## Tiger Model Coarse-Training
 Coarse-Training: based on the Stable Diffusion (SD) model . Training utilizes ultrasound images and corresponding textual reports (Image + Prompt) as inputs. During this phase, the model is able to generate coarse-grained image features based on text. 
