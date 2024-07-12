@@ -1,5 +1,5 @@
-export MODEL_DIR="../modelsaved/OUTPUT_DIR-Corase"
-export OUTPUT_DIR="/modelsaved/OUTPUT_DIR-Fine"
+export MODEL_DIR="../modelsaved/Tiger-Corase/checkpoint-xxx"
+export OUTPUT_DIR="/modelsaved/Tiger-Fine"
 export DATASET="../dataset/training data/init_image"
 
 CUDA_VISIBLE_DEVICES='0,1,2' accelerate launch --multi_gpu --num_processes=3 Tiger Model/Fine-Training.py \
@@ -16,6 +16,6 @@ CUDA_VISIBLE_DEVICES='0,1,2' accelerate launch --multi_gpu --num_processes=3 Tig
      --image_column="image" \
      --caption_column_nd="text_nd" --caption_column_bg="text_bd" \
      --conditioning_nd_column="condition_nd" --conditioning_bg_column="condition_bg" \
-     --validation_image "../Figure1.png" \
+     --validation_image "../Figure.png" \
      --validation_prompt "malignant papillary solid" \
      --validation_steps=500
