@@ -2,7 +2,7 @@ export MODEL_NAME="../sdmodel/v2-1" # In this study, Stable diffusion v2-1 is us
 export DATASET_NAME="../dataset/thyroid_image/training_data"
 export PROMPT="ultrasound of papillary thyroid carcinoma, malignancy, wider-than-tall, shape" # Prompt to verify the effect of model generation
 
-CUDA_VISIBLE_DEVICES='0,1,2,3,4,5,6,7' accelerate launch --multi_gpu --num_processes=8 ./Tiger-Model/train_text_to_image_lora.py \
+CUDA_VISIBLE_DEVICES='0,1,2,3,4,5,6,7' accelerate launch --multi_gpu --num_processes=8 Tiger Model/Coarse-Training.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
     --dataset_name=$DATASET_NAME \
     --caption_column="text" \
