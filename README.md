@@ -3,7 +3,7 @@
 ## Enhancing Diagnostic Generalization of AI Models in Rare Thyroid Cancers: A Clinical Knowledge-Guided Data Augmentation Approach Using Generative Models
 __Fang Dai†, Siqiong Yao†\*, Min Wang, Yicheng Zhu, Xiangjun Qiu, Peng Sun, Jisheng Yin, Guangtai Shen, Jingjing Sun, Maofeng Wang, Yun Wang, Zheyu Yang, Jianfeng Sang, Xiaolei Wang, Fenyong Sun\*, Wei Cai\*, Xingcai Zhang\*, Hui Lu\*__\
 \* To whom correspondence should be addressed.  
-†These authors contributed equally to this work.
+†These authors contributed equally to this work.\
 Email: huilu@sjtu.edu.cn.
 
 ### Abstract
@@ -72,12 +72,8 @@ Partial thyroid ultrasonography data used in this study are subject to privacy r
 ## Training data preparation
 metadata.josnl: The file is placed under folder dataset/training data/init_image, each of which acts as the file name of the image, the associated condition file, and text information to facilitate the subsequent import of the model
 
-{"file_name": "20191101_094744_1.png", \
-"condition_nd": "../DATA/condition_nd/20191101_094744_1.png", \
-"condition_bg": "../DATA/condition_bg/20191101_094744_1.png", \
-"text_nd": "papillary, wider-than-tall, clear, regular", \
-"text_bg": "145.819221, 51.008308, 2.096069"}
-{... ...}
+| {"file_name": "20191101_094744_1.png", "condition_nd": "../DATA/condition_nd/20191101_094744_1.png", "condition_bg": "../DATA/condition_bg/20191101_094744_1.png", "text_nd": "papillary, wider-than-tall, clear, regular", "text_bg": "145.819221, 51.008308, 2.096069"}
+| {... ...}
 
 ## Installation
 We recommend installing Tiger Model in a virtual environment via Conda. For more detailed information about installing PyTorch, please refer to the official documentation.
