@@ -72,7 +72,7 @@ Partial thyroid ultrasonography data used in this study are subject to privacy r
 ## Training data preparation
 metadata.josnl: The file is placed under folder dataset/training data/init_image, each of which acts as the file name of the image, the associated condition file, and text information to facilitate the subsequent import of the model
 
-| {"file_name": "20191101_094744_1.png", "condition_nd": "../DATA/condition_nd/20191101_094744_1.png", "condition_bg": "../DATA/condition_bg/20191101_094744_1.png", "text_nd": "papillary, wider-than-tall, clear, regular", "text_bg": "145.819221, 51.008308, 2.096069"}
+| {"file_name": "20191101_094744_1.png", "condition_nd": "../training data/condition_nd/20191101_094744_1.png", "condition_bg": "../training data/condition_bg/20191101_094744_1.png", "text_nd": "papillary, wider-than-tall, clear, regular", "text_bg": "145.819221, 51.008308, 2.096069"}
 | {... ...}
 
 ## Installation
@@ -91,7 +91,6 @@ conda install -c conda-forge diffusers
 ```sh
 conda list -e > requirements.txt
 ```
-## Stable Diffusion
 
 ## Tiger Model Coarse-Training
 Coarse-Training: based on the Stable Diffusion (SD) model . Training utilizes ultrasound images and corresponding textual reports (Image + Prompt) as inputs. During this phase, the model is able to generate coarse-grained image features based on text. 
@@ -116,9 +115,10 @@ $ python generation.py
 
 ## Evaluation criteria
 ### CLIP score
-The CLIP scoring criteria involve [training](https://github.com/revantteotia/clip-training.git) a CLIP model and calculating the CLIP score based on the corresponding CLIP values from the model. For specific calculation methods, please refer to the appendix. The CLIP training code is referenced from this study.
+The CLIP scoring criteria involve [training](https://github.com/revantteotia/clip-training) a CLIP model and calculating the CLIP score based on the corresponding CLIP values from the model. For specific calculation methods, please refer to the appendix. The CLIP training code is referenced from this study.
 
-
+### Moso score
+We employ the [MoSo score](https://github.com/hrtan/MoSo) to control the quality of generated images, which measures the change in the optimal empirical risk after the exclude of a particular sample from the training set.
 ## Reference
 All references are listed in the article.
 
