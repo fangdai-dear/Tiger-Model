@@ -71,10 +71,10 @@ Partial thyroid ultrasonography data used in this study are subject to privacy r
 
 ## Training data preparation
 metadata.josnl: The file is placed under folder dataset/training data/init_image, each of which acts as the file name of the image, the associated condition file, and text information to facilitate the subsequent import of the model
-
+```sh
 | {"file_name": "20191101_094744_1.png", "condition_nd": "../training data/condition_nd/20191101_094744_1.png", "condition_bg": "../training data/condition_bg/20191101_094744_1.png", "text_nd": "papillary, wider-than-tall, clear, regular", "text_bg": "145.819221, 51.008308, 2.096069"}\
 | {... ...}
-
+```
 ## Installation
 We recommend installing Tiger Model in a virtual environment via Conda. For more detailed information about installing PyTorch, please refer to the official documentation.
 
@@ -114,7 +114,7 @@ $ python Tiger Model/generation.py
 ##  Binary classification Resnet50 training
 In the training stage, the generated image and the real image are mixed together to train the classification model.
 ```sh
-$ sh resnet.sh
+$ sh ResnNet_main.sh
 ```
 
 ## Evaluation criteria
