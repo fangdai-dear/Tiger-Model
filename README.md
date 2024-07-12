@@ -72,7 +72,7 @@ Partial thyroid ultrasonography data used in this study are subject to privacy r
 ## Training data preparation
 metadata.josnl: The file is placed under folder dataset/training data/init_image, each of which acts as the file name of the image, the associated condition file, and text information to facilitate the subsequent import of the model
 
-| {"file_name": "20191101_094744_1.png", "condition_nd": "../training data/condition_nd/20191101_094744_1.png", "condition_bg": "../training data/condition_bg/20191101_094744_1.png", "text_nd": "papillary, wider-than-tall, clear, regular", "text_bg": "145.819221, 51.008308, 2.096069"}
+| {"file_name": "20191101_094744_1.png", "condition_nd": "../training data/condition_nd/20191101_094744_1.png", "condition_bg": "../training data/condition_bg/20191101_094744_1.png", "text_nd": "papillary, wider-than-tall, clear, regular", "text_bg": "145.819221, 51.008308, 2.096069"}\
 | {... ...}
 
 ## Installation
