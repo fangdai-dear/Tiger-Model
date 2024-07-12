@@ -58,12 +58,14 @@ $ pip install -r requirements.txt
 Partial thyroid ultrasonography data used in this study are subject to privacy restrictions, but may be anonymized and made available upon reasonable request to the corresponding author.
 
 ## Training data preparation
-metadata.josnl
+metadata.josnl\ 
+
 {"file_name": "20191101_094744_1.png", \
 "condition_nd": "../DATA/condition_nd/20191101_094744_1.png", \
 "condition_bg": "../DATA/condition_bg/20191101_094744_1.png", \
 "text_nd": "papillary, wider-than-tall, clear, regular", \
 "text_bg": "145.819221, 51.008308, 2.096069"}
+{... ...}
 
 ## Installation
 We recommend installing Tiger Model in a virtual environment via Conda. For more detailed information about installing PyTorch, please refer to the official documentation.
@@ -80,24 +82,29 @@ conda install -c conda-forge diffusers
 conda list -e > requirements.txt
 ```
 
-## Coarse-Training
+## Tiger Model Coarse-Training
 Coarse-Training: based on the Stable Diffusion (SD) model . Training utilizes ultrasound images and corresponding textual reports (Image + Prompt) as inputs. During this phase, the model is able to generate coarse-grained image features based on text. 
 ```sh
 $ sh ./pretrain.sh
 ```
 
-## Fine-Training
+## Tiger Model Fine-Training
 To optimize details, utilized the trainable Encoder weights from the Coarse-Training 
 model , and employed the conditional control method similar to ControlNet but with some differences.
 ```sh
 $ sh ./finetune.sh
 ```
 
-## Inference
+## Tiger Model Inference
 Tiger Model's application scenarios (inference) can be divided into two categories (Supplementary Fig.3). The first type is Diversify Inference, which involves generating thyroid feature textual prompts based on prompt input combinations. Tiger Model generates synthetic images based on the prompt content, controlling the synthesis of corresponding fine-grained foreground-background features within the model. The second type is Reference Inference, where the input comprises real images. Tiger Model generates images consistent with the subtype of the input image. Both generation scenarios allow for the control of corresponding foreground-background features as needed during the generation process. 
+```sh
+$ python generation.py
+```
 
 ## Evaluation criteria
 ### CLIP score
+The CLIP scoring criteria involve training a CLIP model and calculating the CLIP score based on the corresponding CLIP values from the model. For specific calculation methods, please refer to the appendix. The CLIP training code is referenced from this study.
+https://github.com/revantteotia/clip-training.git
 
 ## Reference
 All references are listed in the article.
