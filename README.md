@@ -18,13 +18,15 @@ $ pip install -r requirements.txt
 1. Thyroid dataset
 ```sh
 ├─Thyroid
-    └─TNS
-        ├─test
-        │  ├─0
-        │  └─1
-        ├─train
-        │  ├─0
-        │  └─1
+    └─DATA
+        ├─init_image
+            20191101_094744_1.png
+            ... ...
+            metadata.jsonl
+        ├─condition_nd
+            20191101_094744_1.png
+        ├─condition_bg
+            20191101_094744_1.png
 ```
 2. Chexpert chest radiograph multi-classification dataset
 ```sh
@@ -52,8 +54,12 @@ $ pip install -r requirements.txt
 Partial thyroid ultrasonography data used in this study are subject to privacy restrictions, but may be anonymized and made available upon reasonable request to the corresponding author.
 
 ## Training data preparation
-
-{"file_name": "20191101_094744_1.png", "condition_nd": "/export/home/daifang/Diffusion/own_code/dataset/Allclass/condition_nd/20191101_094744_1.png", "condition_bg": "/export/home/daifang/Diffusion/own_code/dataset/Allclass/condition_bg/20191101_094744_1.png", "text_nd": "papillary", "text_bg": "145.819221, 51.008308, 2.096069"}
+metadata.josnl
+{"file_name": "20191101_094744_1.png", 
+"condition_nd": "../DATA/condition_nd/20191101_094744_1.png", 
+"condition_bg": "../DATA/condition_bg/20191101_094744_1.png", 
+"text_nd": "papillary, wider-than-tall, clear, regular", 
+"text_bg": "145.819221, 51.008308, 2.096069"}
 
 ```sh
 $ sh ./main.sh
