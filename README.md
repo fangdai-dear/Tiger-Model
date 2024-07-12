@@ -110,8 +110,12 @@ Tiger Model's application scenarios (inference) can be divided into two categori
 ```sh
 $ python generation.py
 ```
-## Tiger Model Inference
 
+##  Binary classification Resnet50 training
+In the training stage, the generated image and the real image are mixed together to train the classification model.
+```sh
+$ sh resnet.sh
+```
 
 ## Evaluation criteria
 ### CLIP score
@@ -119,6 +123,7 @@ The CLIP scoring criteria involve [training](https://github.com/revantteotia/cli
 
 ### Moso score
 We employ the [MoSo score](https://github.com/hrtan/MoSo) to control the quality of generated images, which measures the change in the optimal empirical risk after the exclude of a particular sample from the training set.
+
 ## Reference
 All references are listed in the article.
 
