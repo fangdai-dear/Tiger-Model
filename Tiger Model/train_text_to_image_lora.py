@@ -21,12 +21,13 @@ import os
 import random
 import shutil
 from pathlib import Path
+
 import datasets
 import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.utils.checkpoint
-import transformers123
+import transformers
 from accelerate import Accelerator
 from accelerate.logging import get_logger
 from accelerate.utils import ProjectConfiguration, set_seed
@@ -34,18 +35,19 @@ from datasets import load_dataset
 from packaging import version
 from torchvision import transforms
 from tqdm.auto import tqdm
-from transformers123 import CLIPTextModel, CLIPTokenizer
+from transformers import CLIPTextModel, CLIPTokenizer
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-import diffusers123
-from diffusers123 import AutoencoderKL, DDPMScheduler, DiffusionPipeline, UNet2DConditionModel
-from diffusers123.loaders import AttnProcsLayers
-from diffusers123.models.attention_processor import LoRAAttnProcessor
-from diffusers123.optimization import get_scheduler
-from diffusers123.utils import check_min_version, is_wandb_available
-from diffusers123.utils.import_utils import is_xformers_available
+import diffusers
+from diffusers import AutoencoderKL, DDPMScheduler, DiffusionPipeline, UNet2DConditionModel, DPMSolverMultistepScheduler
+from diffusers.loaders import AttnProcsLayers
+from diffusers.models.attention_processor import LoRAAttnProcessor
+from diffusers.optimization import get_scheduler
+from diffusers.utils import check_min_version, is_wandb_available
+from diffusers.utils.import_utils import is_xformers_available
+import warnings
+warnings.filterwarnings('ignore')
 
-
-# Will error if the minimal version of diffusers123 is not installed. Remove at your own risks.
+# Will error if the minimal version of diffusers is not installed. Remove at your own risks.
 
 
 logger = get_logger(__name__, log_level="INFO")
@@ -63,9 +65,9 @@ license: creativeml-openrail-m
 base_model: {base_model}
 tags:
 - stable-diffusion
-- stable-diffusion-diffusers123
+- stable-diffusion-diffusers
 - text-to-image
-- diffusers123
+- diffusers
 - lora
 inference: true
 ---
@@ -136,7 +138,7 @@ def parse_args():
     parser.add_argument(
         "--num_validation_images",
         type=int,
-        default=1,
+        default=4,
         help="Number of images that should be generated during validation with `validation_prompt`.",
     )
     parser.add_argument(
@@ -294,7 +296,7 @@ def parse_args():
     parser.add_argument(
         "--mixed_precision",
         type=str,
-        default=None,
+        default="no",
         choices=["no", "fp16", "bf16"],
         help=(
             "Whether to use mixed precision. Choose between fp16 and bf16 (bfloat16). Bf16 requires PyTorch >="
@@ -390,12 +392,12 @@ def main():
     logger.info(accelerator.state, main_process_only=False)
     if accelerator.is_local_main_process:
         datasets.utils.logging.set_verbosity_warning()
-        transformers123.utils.logging.set_verbosity_warning()
-        diffusers123.utils.logging.set_verbosity_info()
+        transformers.utils.logging.set_verbosity_warning()
+        diffusers.utils.logging.set_verbosity_info()
     else:
         datasets.utils.logging.set_verbosity_error()
-        transformers123.utils.logging.set_verbosity_error()
-        diffusers123.utils.logging.set_verbosity_error()
+        transformers.utils.logging.set_verbosity_error()
+        diffusers.utils.logging.set_verbosity_error()
 
     # If passed along, set the training seed now.
     if args.seed is not None:
@@ -437,6 +439,18 @@ def main():
     vae.to(accelerator.device, dtype=weight_dtype)
     text_encoder.to(accelerator.device, dtype=weight_dtype)
 
+    # now we will add new LoRA weights to the attention layers
+    # It's important to realize here how many attention weights will be added and of which sizes
+    # The sizes of the attention layers consist only of two different variables:
+    # 1) - the "hidden_size", which is increased according to `unet.config.block_out_channels`.
+    # 2) - the "cross attention size", which is set to `unet.config.cross_attention_dim`.
+
+    # Let's first see how many attention processors we will have to set.
+    # For Stable Diffusion, it should be equal to:
+    # - down blocks (2x attention layers) * (2x transformer layers) * (3x down blocks) = 12
+    # - mid blocks (2x attention layers) * (1x transformer layers) * (1x mid blocks) = 2
+    # - up blocks (2x attention layers) * (3x transformer layers) * (3x down blocks) = 18
+    # => 32 layers
 
     # Set correct lora layers
     lora_attn_procs = {}
@@ -539,7 +553,11 @@ def main():
             data_files=data_files,
             cache_dir=args.cache_dir,
         )
+        # See more about loading custom images at
+        # https://huggingface.co/docs/datasets/v2.4.0/en/image_load#imagefolder
 
+    # Preprocessing the datasets.
+    # We need to tokenize inputs and targets.
     column_names = dataset["train"].column_names
 
     # 6. Get the column names for input/target.
@@ -682,7 +700,6 @@ def main():
             accelerator.print(f"Resuming from checkpoint {path}")
             accelerator.load_state(os.path.join(args.output_dir, path))
             global_step = int(path.split("-")[1])
-
             resume_global_step = global_step * args.gradient_accumulation_steps
             first_epoch = global_step // num_update_steps_per_epoch
             resume_step = resume_global_step % (num_update_steps_per_epoch * args.gradient_accumulation_steps)
@@ -801,15 +818,86 @@ def main():
                                     shutil.rmtree(removing_checkpoint)
 
                         save_path = os.path.join(args.output_dir, f"checkpoint-{global_step}")
-                        accelerator.save_state(save_path)
+                        logger.info(f"Saved state to {save_path}")
+
+                        unet = unet.to(torch.float32)
+                        unet.save_attn_procs(save_path)
                         
+                        # create pipeline
+                        # pipeline = DiffusionPipeline.from_pretrained(
+                        #     args.pretrained_model_name_or_path,
+                        #     unet=accelerator.unwrap_model(unet),
+                        #     revision=args.revision,
+                        #     torch_dtype=weight_dtype,
+                        # )
+                        # pipeline = pipeline.to(accelerator.device)
+                        # pipeline.set_progress_bar_config(disable=True)
 
-            logs = {"step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
-            progress_bar.set_postfix(**logs)
+                        # # run inference
+                        # generator = torch.Generator(device=accelerator.device)
+                        
+                        # images = []
+                        # for i in range(args.num_validation_images):
+                        #     if args.seed is not None:
+                        #         generator = generator.manual_seed(args.seed + i + args.checkpointing_steps)
+                        #     images.append(
+                        #         pipeline(args.validation_prompt, num_inference_steps=30, generator=generator, guidance_scale=7).images[0]
+                        #     )
 
-            if global_step >= args.max_train_steps:
-                break
+                        if args.validation_prompt is not None:
+                            logger.info(
+                                f"Running validation... \n Generating {args.num_validation_images} images with prompt:"
+                                f" {args.validation_prompt}."
+                            )
+                            print()
+                            # create pipeline
+                            pipeline = DiffusionPipeline.from_pretrained(
+                                args.pretrained_model_name_or_path,
+                                unet=accelerator.unwrap_model(unet),
+                                revision=args.revision,
+                                torch_dtype=weight_dtype,
+                            )
+                            pipeline = pipeline.to(accelerator.device)
+                            pipeline.set_progress_bar_config(disable=True)
+                            pipeline.scheduler = DPMSolverMultistepScheduler.from_config(pipeline.scheduler.config)
+                            # run inference
+                            generator = torch.Generator(device=accelerator.device).manual_seed(args.seed)
+                            images = []
+                            for _ in range(args.num_validation_images):
+                                images.append(
+                                    pipeline(
+                                        args.validation_prompt,
+                                        height=args.resolution,
+                                        width=args.resolution, 
+                                        num_inference_steps=45, 
+                                        generator=generator
+                                        ).images[0]
+                                )
+                            image2 = pipeline(
+                                'High quality photo of an astronaut riding a horse in space', 
+                                guidance_scale=7, 
+                                height=args.resolution,
+                                width=args.resolution, 
+                                num_inference_steps=45
+                                ).images[0]
+                            images.append(image2)
 
+                            for tracker in accelerator.trackers:
+                                if tracker.name == "tensorboard":
+                                    np_images = np.stack([np.asarray(img) for img in images])
+                                    tracker.writer.add_images("validation", np_images, epoch, dataformats="NHWC")
+                                if tracker.name == "wandb":
+                                    tracker.log(
+                                        {
+                                            "validation": [
+                                                wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
+                                                for i, image in enumerate(images)
+                                            ]
+                                        }
+                                    )
+
+                        del pipeline
+                        torch.cuda.empty_cache()
 
     # Save the lora layers
     accelerator.wait_for_everyone()
@@ -829,28 +917,28 @@ def main():
     pipeline.unet.load_attn_procs(args.output_dir)
 
     # run inference
-    # generator = torch.Generator(device=accelerator.device)
-    # if args.seed is not None:
-    #     generator = generator.manual_seed(args.seed)
-    # images = []
-    # for _ in range(args.num_validation_images):
-    #     images.append(pipeline(args.validation_prompt, num_inference_steps=30, generator=generator).images[0])
+    generator = torch.Generator(device=accelerator.device)
+    if args.seed is not None:
+        generator = generator.manual_seed(args.seed)
+    images = []
+    for _ in range(args.num_validation_images):
+        images.append(pipeline(args.validation_prompt, num_inference_steps=30, generator=generator).images[0])
 
-    # if accelerator.is_main_process:
-    #     for tracker in accelerator.trackers:
-    #         if len(images) != 0:
-    #             if tracker.name == "tensorboard":
-    #                 np_images = np.stack([np.asarray(img) for img in images])
-    #                 tracker.writer.add_images("test", np_images, epoch, dataformats="NHWC")
-    #             if tracker.name == "wandb":
-    #                 tracker.log(
-    #                     {
-    #                         "test": [
-    #                             wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
-    #                             for i, image in enumerate(images)
-    #                         ]
-    #                     }
-    #                 )
+    if accelerator.is_main_process:
+        for tracker in accelerator.trackers:
+            if len(images) != 0:
+                if tracker.name == "tensorboard":
+                    np_images = np.stack([np.asarray(img) for img in images])
+                    tracker.writer.add_images("test", np_images, epoch, dataformats="NHWC")
+                if tracker.name == "wandb":
+                    tracker.log(
+                        {
+                            "test": [
+                                wandb.Image(image, caption=f"{i}: {args.validation_prompt}")
+                                for i, image in enumerate(images)
+                            ]
+                        }
+                    )
 
     accelerator.end_training()
 
