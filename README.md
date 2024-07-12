@@ -21,7 +21,7 @@ This project uses requirements.txt.
 $ pip install -r requirements.txt
 ```
 ## Datasets
-1. Thyroid dataset
+1. Thyroid dataset for Tiger Model (The other external validation datasets(BrEaST, BUSI, VinDr-PCXR) are also deployed in folders in the same manner.)
 ```sh
 ├─dataset
     └─training data
@@ -36,28 +36,36 @@ $ pip install -r requirements.txt
             20191101_094744_1.png
             ... ...
 ```
-2. Chexpert chest radiograph multi-classification dataset
+2. Thyroid dataset for Resnet Model (The other external validation datasets(BrEaST, BUSI, VinDr-PCXR) are also deployed in folders in the same manner.)
 ```sh
-├─CheXpert-v1.0
-│  ├─train
-│  │  └─patient00001
-│  │      └─study1
-│  │              view1_frontal.jpg
-│  │              
-│  └─valid
-│      └─patient64541
-│          └─study1
-│                  view1_frontal.jpg
-```
-3. ISIC2019 skin disease multi-classification dataset
-```     sh              
-├─ISIC
-│  ├─ISIC_2018
-│  │      ISIC_0024306.jpg
-│  │      
-│  └─ISIC_2019
-│          ISIC_0000000.jpg
-│          
+├─dataset
+│  ├─Renset training data
+│  │  └─PTC
+│  │      └─train
+│  │          └─0
+│  │              figure1.jpg
+                  ... ...
+│  │          └─1
+│  │              figure2.jpg
+                  ... ...
+│  │      └─valid
+│  │          └─0
+│  │              figure3.jpg
+                  ... ...
+│  │          └─1
+│  │              figure4.jpg
+                  ... ...
+│  │      └─test
+│  │          └─0
+│  │              figure3.jpg
+                  ... ...
+│  │          └─1
+│  │              figure4.jpg
+                  ... ...
+│  │  └─FTC
+        ... ...
+│  │  └─MTC
+        ... ...
 ```
 Partial thyroid ultrasonography data used in this study are subject to privacy restrictions, but may be anonymized and made available upon reasonable request to the corresponding author.
 
