@@ -1,9 +1,8 @@
-export MODEL_NAME="../model/v2-1"
-export DATASET_NAME="../dataset/thyroid_image/ALLclass"
-export DATASET_NAME="./dataset/thyroid_image/ALLclass"
-export PROMPT="ultrasound of papillary thyroid carcinoma, malignancy, wider-than-tall, shape"
+export MODEL_NAME="../sdmodel/v2-1" # In this study, Stable diffusion v2-1 is used as the pre-training model
+export DATASET_NAME="../dataset/thyroid_image/training_data"
+export PROMPT="ultrasound of papillary thyroid carcinoma, malignancy, wider-than-tall, shape" # Prompt to verify the effect of model generation
 
-CUDA_VISIBLE_DEVICES='0,1,2,3,4,5,6,7' accelerate launch --multi_gpu --num_processes=8 ./example/train_text_to_image_lora.py \
+CUDA_VISIBLE_DEVICES='0,1,2,3,4,5,6,7' accelerate launch --multi_gpu --num_processes=8 ./Tiger-Model/train_text_to_image_lora.py \
     --pretrained_model_name_or_path=$MODEL_NAME \
     --dataset_name=$DATASET_NAME \
     --caption_column="text" \
@@ -17,7 +16,8 @@ CUDA_VISIBLE_DEVICES='0,1,2,3,4,5,6,7' accelerate launch --multi_gpu --num_proce
     --lr_scheduler="constant" \
     --lr_warmup_steps=500 \
     --seed=2024 \
-    --output_dir="./modelsaved/sd-pretrain" \
+    --output_dir="./modelsaved/Tiger-Corase" \ # Model saving
     --validation_epochs=1 \
-    --validation_prompt="ultrasound of papillary thyroid carcinoma, malignancy, wider-than-tall, shape" 
-    # --report_to="wandb"
+    --validation_prompt=$PROMPT
+    --report_to="wandb"  
+# For the description of parameter meanings, see Appendix
