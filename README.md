@@ -57,10 +57,10 @@ $ pip install -r requirements.txt
                   ... ...
 │  │      └─test
 │  │          └─0
-│  │              figure3.jpg
+│  │              figure5.jpg
                   ... ...
 │  │          └─1
-│  │              figure4.jpg
+│  │              figure6.jpg
                   ... ...
 │  │  └─FTC
         ... ...
@@ -81,6 +81,7 @@ metadata.josnl\
 
 ## Installation
 We recommend installing Tiger Model in a virtual environment via Conda. For more detailed information about installing PyTorch, please refer to the official documentation.
+
 ### PyTorch-diffusers
 With `pip` (official package):
 ```bash
@@ -112,6 +113,8 @@ Tiger Model's application scenarios (inference) can be divided into two categori
 ```sh
 $ python generation.py
 ```
+## Tiger Model Inference
+
 
 ## Evaluation criteria
 ### CLIP score
