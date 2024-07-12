@@ -9,7 +9,7 @@ Email: huilu@sjtu.edu.cn.\
 ### Abstract
 Artificial intelligence (AI) in oncology imaging struggles with diagnosing rare tumors. Our study identified performance gaps in detecting rare thyroid cancer subtypes using ultrasound, leading to misdiagnoses and adverse prognostic outcomes. Sample scarcity for rare conditions impedes effective model training. Although data augmentation techniques can alleviate sample size constraints, trainable examples cannot encompass the full spectrum of disease manifestations, rendering traditional generative augmentation approaches inadequate. Our approach integrates clinical knowledge with text-image generation, enabling fine-grained control and supplementation of unique features specific to rare subtypes, emphasizing text guidance. This results in augmented samples that more accurately reflect genuine disease cases. Our model, trained on data from 40,571 patients, including 5,099 rare cases, exceeds current state-of-the-art methods, enhancing the AUC for two rare subtypes by 14.64% and 9.45%, respectively. In Turing tests, we achieved 92.2% for authenticity, 90.96% for consistency, and 84.1% for diversity, surpassing competitors by 35.6%. Generalization ability of this methodology was validated on public datasets such as the BrEaST, BUSI, and VinDr-PCXR datasets. This approach mitigates the challenges of data diversity and representativeness for rare diseases, contributing to the model’s generalization ability and diagnostic accuracy, ultimately improving the effectiveness and practical outcomes of medical AI applications.
 
-## Research Status: Under Review
+#### Research Status: Under Review
 
 ## Model architecture
 The model architecture is included in the manuscript and will not be displayed before the article is published.
@@ -82,7 +82,7 @@ metadata.josnl: The file is placed under folder dataset/training data/init_image
 ## Installation
 We recommend installing Tiger Model in a virtual environment via Conda. For more detailed information about installing PyTorch, please refer to the official documentation.
 
-### PyTorch-diffusers
+### PyTorch-diffusers (including Stable Diffusion, ControlNet, Transformer)
 With `pip` (official package):
 ```bash
 pip install --upgrade diffusers[torch]
@@ -91,6 +91,7 @@ With `conda` (maintained by the community):
 ```sh
 conda install -c conda-forge diffusers
 ```
+### PyTorch-Others
 ```sh
 conda list -e > requirements.txt
 ```
