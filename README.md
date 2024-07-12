@@ -95,14 +95,14 @@ conda list -e > requirements.txt
 ## Tiger Model Coarse-Training
 Coarse-Training: based on the Stable Diffusion (SD) model . Training utilizes ultrasound images and corresponding textual reports (Image + Prompt) as inputs. During this phase, the model is able to generate coarse-grained image features based on text. 
 ```sh
-$ sh ./Tiger-corase.sh
+$ sh ./Tiger-Corase.sh
 ```
 
 ## Tiger Model Fine-Training
 To optimize details, utilized the trainable Encoder weights from the Coarse-Training 
 model , and employed the conditional control method similar to ControlNet but with some differences.
 ```sh
-$ sh ./Tiger-fine.sh
+$ sh ./Tiger-Fine.sh
 ```
 
 ## Tiger Model Inference
