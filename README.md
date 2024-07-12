@@ -24,7 +24,7 @@ $ pip install -r requirements.txt
 1. Thyroid dataset
 ```sh
 ├─dataset
-    └─training dataset
+    └─training data
         ├─init_image
             20191101_094744_1.png
             ... ...
