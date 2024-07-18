@@ -36,11 +36,11 @@ class ISImageDataset(Dataset):
     def __len__(self):
         return len(self.files)
 
-path = '/export/home/daifang/Diffusion/own_code/Figure/MTC'
+path = '.../Figure/'
 count = 0
-for root,dirs,files in os.walk(path):    #遍历统计
+for root,dirs,files in os.walk(path):   
       for each in files:
-             count += 1   #统计文件夹下文件个数
+             count += 1   
 print(count)
 batch_size = 64
 transforms_ = [
@@ -81,12 +81,12 @@ split_scores = []
 splits=10
 N = count
 for k in range(splits):
-    part = preds[k * (N // splits): (k + 1) * (N // splits), :] # split the whole data into several parts
-    py = np.mean(part, axis=0)  # marginal probability
+    part = preds[k * (N // splits): (k + 1) * (N // splits), :] 
+    py = np.mean(part, axis=0) 
     scores = []
     for i in range(part.shape[0]):
-        pyx = part[i, :]  # conditional probability
-        scores.append(entropy(pyx, py))  # compute divergence
+        pyx = part[i, :]  
+        scores.append(entropy(pyx, py))  
     split_scores.append(np.exp(np.mean(scores)))
 
 
