@@ -36,10 +36,13 @@ from packaging import version
 from PIL import Image
 from torchvision import transforms
 from tqdm.auto import tqdm
-from transformers123 import AutoTokenizer, PretrainedConfig
-
-import diffusers123
-from diffusers123 import (
+import transformers
+from transformers import AutoTokenizer, PretrainedConfig
+import tensorflow as tf
+tf.get_logger().setLevel('ERROR')
+from collections import Counter
+import diffusers_Tiger
+from diffusers_Tiger import (
     AutoencoderKL,
     ControlNetModel,
     DDPMScheduler,
@@ -49,10 +52,10 @@ from diffusers123 import (
     UniPCMultistepScheduler,
     DDIMScheduler
 )
-from diffusers123.optimization import get_scheduler
-from diffusers123.utils import check_min_version, is_wandb_available
-from diffusers123.utils.import_utils import is_xformers_available
-from diffusers123 import fuse
+from diffusers_Tiger.optimization import get_scheduler
+from diffusers_Tiger.utils import check_min_version, is_wandb_available
+from diffusers_Tiger.utils.import_utils import is_xformers_available
+from diffusers_Tiger import fuse
 
 if is_wandb_available():
     import wandb
@@ -235,9 +238,9 @@ def save_model_card(repo_id: str, image_logs=None, base_model=str, repo_folder=N
     base_model: {base_model}
     tags:
     - stable-diffusion
-    - stable-diffusion-diffusers123
+    - stable-diffusion-diffusers
     - text-to-image
-    - diffusers123
+    - diffusers
     - controlnet
     inference: true
     ---
@@ -632,7 +635,7 @@ def make_train_dataset(args, tokenizer, accelerator):
             )
     column_names = dataset["train"].column_names
     ##########################################################################################################################################################################
-    # 6. Get the column names for input/target.
+    # Get the column names for input/target.
     # target image
     if args.image_column is None:
         image_column = column_names[0]
@@ -645,6 +648,7 @@ def make_train_dataset(args, tokenizer, accelerator):
             )
     # condition nodule image
     if args.conditioning_nd_column is None:
+
         conditioning_nd_column = column_names[1]
         logger.info(f"conditioning image column defaulting to {conditioning_nd_column}")
     else:
@@ -664,6 +668,7 @@ def make_train_dataset(args, tokenizer, accelerator):
                 f"`--conditioning_bg_column` value '{args.conditioning_bg_column}' not found in dataset columns. Dataset columns are: {', '.join(column_names)}"
             )
     # condition nodule text
+
     if args.caption_column_nd is None:
         caption_column_nd = column_names[3]
         logger.info(f"caption column defaulting to {caption_column_nd}")
@@ -685,7 +690,7 @@ def make_train_dataset(args, tokenizer, accelerator):
             )
     ##########################################################################################################################################################################
 
-    def tokenize_captions(examples, caption_column, is_train=True):
+    def tokenize_captions(examples, caption_column, names, is_train=True):
         captions = []
         for caption in examples[caption_column]:
             if random.random() < args.proportion_empty_prompts:
@@ -700,10 +705,40 @@ def make_train_dataset(args, tokenizer, accelerator):
                 raise ValueError(
                     f"Caption column `{caption_column_nd}` should contain either strings or lists of strings."
                 )
-        print(captions)
+
         inputs = tokenizer(
             captions, max_length=tokenizer.model_max_length, padding="max_length", truncation=True, return_tensors="pt"
         )
+
+        def calculate_word_frequencies(phrases):
+            total_counts = Counter()
+            total_words = 0
+            for phrase in phrases:
+                words = phrase.replace(',', '').split()
+                total_counts.update(words)
+                total_words += len(words)
+            frequencies = {word: count / total_words for word, count in total_counts.items()}
+            return frequencies, total_words
+
+        def calculate_average_frequencies(phrases, word_frequencies):
+            average_frequencies = []
+            for phrase in phrases:
+                words = phrase.replace(',', '').split()
+                total_freq = sum(word_frequencies[word] for word in words)
+                avg_freq = total_freq / len(words) if words else 0
+                average_frequencies.append((phrase, avg_freq))
+            return average_frequencies
+        if names == 'nd':
+            word_frequencies, total_word_count = calculate_word_frequencies(captions)
+            weight_matrix = calculate_average_frequencies(captions, word_frequencies)
+            # Extract the values to replace
+            values = [desc[1] for desc in weight_matrix]
+            # Replace the first zero in each row with the corresponding value
+            for i in range(inputs.input_ids.shape[0]):
+                weight = int(values[i]*10**5)
+                inputs.input_ids[i][0] = weight
+        assert not torch.isnan(inputs.input_ids).any(), "inputs.input_ids contains NaN values"
+        
         return inputs.input_ids
 
     image_transforms = transforms.Compose(
@@ -735,8 +770,8 @@ def make_train_dataset(args, tokenizer, accelerator):
         examples["pixel_values"] = images
         examples["conditioning_pixel_values_nd"] = conditioning_nd
         examples["conditioning_pixel_values_bg"] = conditioning_bg
-        examples["input_ids_nd"] = tokenize_captions(examples, caption_column = caption_column_nd)
-        examples["input_ids_bg"] = tokenize_captions(examples, caption_column = caption_column_bg)
+        examples["input_ids_nd"] = tokenize_captions(examples, caption_column = caption_column_nd, names = 'nd')
+        examples["input_ids_bg"] = tokenize_captions(examples, caption_column = caption_column_bg, names = 'bg')
 
         return examples
 
@@ -791,11 +826,11 @@ def main(args):
     )
     logger.info(accelerator.state, main_process_only=False)
     if accelerator.is_local_main_process:
-        transformers123.utils.logging.set_verbosity_warning()
-        diffusers123.utils.logging.set_verbosity_info()
+        transformers.utils.logging.set_verbosity_warning()
+        diffusers_Tiger.utils.logging.set_verbosity_info()
     else:
-        transformers123.utils.logging.set_verbosity_error()
-        diffusers123.utils.logging.set_verbosity_error()
+        transformers.utils.logging.set_verbosity_error()
+        diffusers_Tiger.utils.logging.set_verbosity_error()
 
     # If passed along, set the training seed now.
     if args.seed is not None:
@@ -1054,29 +1089,66 @@ def main(args):
             # (this is the forward diffusion process)
             noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)
             # Get the text embedding for conditioning
-            print(batch["input_ids_nd"])
+
+            weight_nd = batch["input_ids_nd"][:, 0]
+            weight_nd = weight_nd / 10**5
+            batch["input_ids_nd"][:, 0] = 49406
             encoder_hidden_states_nd = text_encoder(batch["input_ids_nd"])[0]
             encoder_hidden_states_bg = text_encoder(batch["input_ids_bg"])[0]
             controlnet_image_nd = batch["conditioning_pixel_values_nd"].to(dtype=weight_dtype)
             controlnet_image_bg = batch["conditioning_pixel_values_bg"].to(dtype=weight_dtype)
-            
-            down_block_res_samples, mid_block_res_sample = controlnet_nd(
+            # print(weight_nd)
+            down_block_res_samples_nd, mid_block_res_sample_nd = controlnet_nd(
                                                                         noisy_latents,
                                                                         timesteps,
                                                                         encoder_hidden_states=encoder_hidden_states_nd, # text 
                                                                         controlnet_cond=controlnet_image_nd,
-                                                                        return_dict=False)
+                                                                        return_dict=False,
+                                                                        weight=weight_nd)
 
+
+
+            down_block_res_samples_bg, mid_block_res_sample_bg = controlnet_bg(
+                                                                        noisy_latents,
+                                                                        timesteps,
+                                                                        encoder_hidden_states=encoder_hidden_states_bg, # text 
+                                                                        controlnet_cond=controlnet_image_bg,
+                                                                        return_dict=False)
             # Predict the noise residual
-            model_pred_ = unet(
+            samples_nd_list, samples_bg_list = [], []
+            for number in range(len(down_block_res_samples_nd)):
+                if number > 1 :
+                    sample = down_block_res_samples_nd[number]
+                    samples_nd = torch.stack((down_block_res_samples_nd[number][0].to('cpu'), \
+                                                        down_block_res_samples_nd[number][0].to('cpu')))
+                    samples_bg = torch.stack((down_block_res_samples_bg[number][0].to('cpu'), \
+                                                        down_block_res_samples_bg[number][0].to('cpu')))
+                    channels = sample.shape[1]
+                    model_fuse_down = fuse.AFF(channels=channels).to(device='cpu')
+                    output = model_fuse_down(samples_nd, samples_bg)[0].unsqueeze(0)
+
+                    samples_nd_list.append(output)
+                    samples_bg_list.append(output)
+                else:
+                    samples_nd_list.append(down_block_res_samples_nd[number])
+                    samples_bg_list.append(down_block_res_samples_bg[number])
+            mid_block_res_sample = mid_block_res_sample_bg + mid_block_res_sample_nd
+            model_pred_nd = unet(
                             noisy_latents,
                             timesteps,
                             encoder_hidden_states=encoder_hidden_states_nd.to('cuda'),
                             down_block_additional_residuals=[
-                                sample.to(dtype=weight_dtype).to('cuda') for sample in down_block_res_samples],
+                                sample.to(dtype=weight_dtype).to('cuda') for sample in samples_nd_list],
                             mid_block_additional_residual=mid_block_res_sample.to('cuda').to(dtype=weight_dtype),
                         ).sample
-           
+            model_pred_bg = unet(
+                            noisy_latents,
+                            timesteps,
+                            encoder_hidden_states=encoder_hidden_states_bg.to('cuda'),
+                            down_block_additional_residuals=[
+                                sample.to(dtype=weight_dtype).to('cuda') for sample in samples_bg_list],
+                            mid_block_additional_residual=mid_block_res_sample.to('cuda').to(dtype=weight_dtype),
+                        ).sample
             # Get the target for loss depending on the prediction type
             if noise_scheduler.config.prediction_type == "epsilon":
                 target = noise
@@ -1084,15 +1156,25 @@ def main(args):
                 target = noise_scheduler.get_velocity(latents, noise, timesteps)
             else:
                 raise ValueError(f"Unknown prediction type {noise_scheduler.config.prediction_type}")
-            
-            loss_nd = F.mse_loss(model_pred_.to('cuda').float(), target.float(), reduction="mean")
-            loss_bg = F.mse_loss(model_pred_.to('cuda').float(), target.float(), reduction="mean")
-            loss = loss_nd + loss_bg
+            loss_nd = F.mse_loss(model_pred_nd.to('cuda').float(), target.float(), reduction="mean")
+            loss_bg = F.mse_loss(model_pred_bg.to('cuda').float(), target.float(), reduction="mean")
             optimizer_nd.zero_grad(set_to_none=args.set_grads_to_none)
-
+            optimizer_bg.zero_grad(set_to_none=args.set_grads_to_none)
+            # h0, h1 = nvmlDeviceGetHandleByIndex(0), nvmlDeviceGetHandleByIndex(1)
+            # info0, info1 = nvmlDeviceGetMemoryInfo(h0), nvmlDeviceGetMemoryInfo(h1)
+            # print(f'0free     : {info0.free}   1free     : {info1.free}')
+            loss = loss_nd + loss_bg
             accelerator.backward(loss)
-
+            # loss_nd.backward()
+            # loss_bg.backward()
+            # if accelerator.sync_gradients:
+            #     params_to_clip_nd = controlnet_nd.parameters()
+            #     accelerator.clip_grad_norm_(params_to_clip_nd, args.max_grad_norm)
+            #     params_to_clip_bg = controlnet_bg.parameters()
+            #     accelerator.clip_grad_norm_(params_to_clip_bg, args.max_grad_norm)
             optimizer_nd.step()
+            
+            optimizer_bg.step()
 
             lr_scheduler.step()
             # Checks if the accelerator has performed an optimization step behind the scenes
@@ -1152,8 +1234,8 @@ def main(args):
     if accelerator.is_main_process:
         controlnet_nd = accelerator.unwrap_model(controlnet_nd)
         controlnet_nd.save_pretrained(args.output_dir)
-        # controlnet_bg = accelerator.unwrap_model(controlnet_bg)
-        # controlnet_bg.save_pretrained(args.output_dir)
+        controlnet_bg = accelerator.unwrap_model(controlnet_bg)
+        controlnet_bg.save_pretrained(args.output_dir)
 
     accelerator.end_training()
 
