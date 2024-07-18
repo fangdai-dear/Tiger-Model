@@ -444,15 +444,9 @@ class AttnProcessor:
         if attn.group_norm is not None:
             hidden_states = attn.group_norm(hidden_states.transpose(1, 2)).transpose(1, 2)
 
-
-
-        # 将A与multiplier进行相乘
         if weight is not None:
             multiplier = weight.unsqueeze(1).unsqueeze(2)
             hidden_states = hidden_states * multiplier
-            print('attention processor hidden_states', hidden_states.shape)
-            print('weight',weight)
-            print('attention processor hidden_states_new',hidden_states.shape)
         query = attn.to_q(hidden_states)
 
 
