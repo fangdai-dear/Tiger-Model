@@ -15,7 +15,7 @@ CUDA_VISIBLE_DEVICES='0,1,2' accelerate launch --multi_gpu --num_processes=3 Tig
      --train_batch_size=24 \ 
      --image_column="image" \
      --caption_column_nd="text_nd" --caption_column_bg="text_bd" \
-     --conditioning_nd_column="condition_nd" --conditioning_bg_column="condition_bg" \
+     --conditioning_nd_column="condition_FG" --conditioning_bg_column="condition_BG" \
      --validation_image "../valid_Figure.png" \
      --validation_prompt "malignant papillary solid ..." \
      --validation_steps=500
