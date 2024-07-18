@@ -13,7 +13,7 @@ import random
 from torchvision import transforms
 import cv2 as cv
 
-######################################################################## noide #########################################################################
+######################################################################## Foreback Generation #########################################################################
 def make_inpaint_condition(image, image_mask):
     image = np.array(image.convert("RGB")).astype(np.float32) / 255.0
     image_mask = np.array(image_mask.convert("L")).astype(np.float32) / 255.0
@@ -23,43 +23,29 @@ def make_inpaint_condition(image, image_mask):
     image = np.expand_dims(image, 0).transpose(0, 3, 1, 2)
     image1 = torch.from_numpy(image)
     return image1
+    
+fig_name = "Image.png" 
 
 
-
-# fig_name = "634771808495156250.jpg" # FTC
-# fig_name = "b17160729112327.png" # PTC
-# fig_name = "validation_80000_0f7cf3a694ce8fc98808.png" # MTC
-fig_name = "图片2.png"  # PTC
-# fig_name = "1.2.840.113663.1500.1.314366652.3.697.20220829.104639.0.jpg" # FTC
-# fig_name = "0007765388_刘国祥_19630405_男_0.jpg" # MTC
-
-init_image = Image.open("/export/home/daifang/Diffusion/own_code/Figure/paper/image/%s" % fig_name)
+init_image = Image.open("../Figure/paper/image/%s" % fig_name)
 init_image = init_image.resize((512, 512))
-#### noudle
-mask_image_nd = Image.open("/export/home/daifang/Diffusion/own_code/Figure/paper/mask_nd/%s" % fig_name)
+
+mask_image_nd = Image.open("../Figure/paper/mask_nd/%s" % fig_name)
 mask_image_nd = mask_image_nd.resize((512, 512))
 control_image_nd = make_inpaint_condition(init_image, mask_image_nd)
 #### background
-mask_image_bg = Image.open("/export/home/daifang/Diffusion/own_code/Figure/paper/mask_bg/%s" % fig_name)
+mask_image_bg = Image.open("../Figure/paper/mask_bg/%s" % fig_name)
 mask_image_bg = mask_image_bg.resize((512, 512))
-# con_name = "b17160729112327.png"
-# con_name =  "b17170117080933.png"
-# con_name =  "000800215_20201022_US_1_10.jpg"
-# # con_name =  "20191105_140953_12.png"
-# con_name =  "b17170112134749.png"
-con_name =  "b17170104143956.png"
-control_image_bg = Image.open('/export/home/daifang/Diffusion/own_code/dataset/Allclass/condition_bg/%s' %  con_name)
-# control_image_bg = Image.open('/export/home/daifang/Diffusion/own_code/dataset/controlnet_condition_nd/condition_bg/%s' %  con_name)
-# control_image_bg = Image.open('/export/home/daifang/Diffusion/own_code/dataset/cut/tmp3frcew5f.png')
+
+con_name =  "Background_Source.png"
+control_image_bg = Image.open('../dataset/Allclass/condition_bg/%s' %  con_name)
 control_image_bg = control_image_bg.resize((512, 512))
 
 # controlnet_nd = ControlNetModel.from_pretrained(
-#     "/export/home/daifang/Diffusion/own_code/modelsaved/try/checkpoint-3000/controlnet", torch_dtype=torch.float16)
-#     # "/export/home/daifang/Diffusion/own_code/modelsaved/try/checkpoint-2000/controlnet", torch_dtype=torch.float16)
-#     # "/export/home/daifang/Diffusion/own_code/modelsaved/control_try/checkpoint-3000/controlnet", torch_dtype=torch.float16)
+#     "../modelsaved/finetrainmodel/checkpoint-3000/controlnet", torch_dtype=torch.float16)
 
 # pipe_nd = StableDiffusionControlNetInpaintPipeline.from_pretrained(
-#     "/export/home/daifang/Diffusion/diffusers/model/sd-8_28", controlnet=controlnet_nd, torch_dtype=torch.float16)
+#     "../model/pretrainmodel", controlnet=controlnet_nd, torch_dtype=torch.float16)
 # pipe_nd.scheduler = DDIMScheduler.from_config(pipe_nd.scheduler.config)
 # pipe_nd.enable_model_cpu_offload()
 
@@ -75,8 +61,6 @@ control_image_bg = control_image_bg.resize((512, 512))
 #                     ["enormous nodes", "middle nodes","mini nodes"]]
 # for i in range(100):
 #     seed_nd =  random.randint(1,1000000)
-#     # seed_nd = 540659
-#     print(seed_nd)
 #     generator = torch.Generator().manual_seed(seed_nd)
 #     image_nd = pipe_nd(
 #         # prompt = "papillary malignant solid taller white points uneven echo low echo middle nodes",
@@ -92,15 +76,15 @@ control_image_bg = control_image_bg.resize((512, 512))
 #         mask_image=mask_image_nd,
 #         control_image=control_image_nd,
 #         ).images[0]
-#     image_nd.save("/export/home/daifang/Diffusion/own_code/Figure/paper/MTC_nd/%s_%s.png" % (fig_name,seed_nd))
+#     image_nd.save("../Figure/%s_%s.png" % (fig_name,seed_nd))
 
 seed_bg = random.randint(1,1000000)
 generator = torch.Generator().manual_seed(seed_bg)
 controlnet_bg = ControlNetModel.from_pretrained(
-    "/export/home/daifang/Diffusion/own_code/modelsaved/control_9-11/checkpoint-5000/controlnet", torch_dtype=torch.float16)
+    "../modelsaved/finetrainmodel/checkpoint-5000/controlnet", torch_dtype=torch.float16)
 
 pipe_bg = StableDiffusionControlNetInpaintPipeline.from_pretrained(
-    "/export/home/daifang/Diffusion/diffusers/model/sd-8_28", controlnet=controlnet_bg, torch_dtype=torch.float16
+    "../model/pretrainmodel", controlnet=controlnet_bg, torch_dtype=torch.float16
 )
 pipe_bg.scheduler = DDIMScheduler.from_config(pipe_bg.scheduler.config)
 pipe_bg.enable_model_cpu_offload()
@@ -124,7 +108,7 @@ image_nd = np.array(image_nd)
 image_bg = np.array(image_bg)
 im2 = np.concatenate((image_nd, image_bg), axis=1)
 im2 = Image.fromarray(im2)
-im2.save("/export/home/daifang/Diffusion/own_code/Figure/PTC_T.png")
+im2.save("../Figure/generationfigure.png")
 
 
 ############################################################################################################################################################################
@@ -139,7 +123,7 @@ im2.save("/export/home/daifang/Diffusion/own_code/Figure/PTC_T.png")
 # control_image1[:,:,2] = control_image
 # im2 = np.concatenate((init_image, mask_image, control_image1, image), axis=1) 
 # im4 = Image.fromarray(im2)
-# image_bg.save("/export/home/daifang/Diffusion/own_code/Figure/img_%s_%s.png" % (fig_name, seed))
+# image_bg.save("../Figure/img_%s_%s.png" % (fig_name, seed))
 # image_nd = np.array(image)
 # init_image = np.array(init_image)
 # mask_image = np.array(mask_image)
@@ -148,7 +132,7 @@ im2.save("/export/home/daifang/Diffusion/own_code/Figure/PTC_T.png")
 # im3 = Image.fromarray(im3)
 # draw = ImageDraw.Draw(img3)
 # draw.text((0,60),'你好',(0,0,0),font=font)
-# image_nd.save("/export/home/daifang/Diffusion/own_code/Figure/noide_%s_%s2.png" % (fig_name, seed))
+# image_nd.save("../Figure/noide_%s_%s2.png" % (fig_name, seed))
 
 ######################################################################## background #########################################################################
 # def make_inpaint_condition(image, image_mask):
@@ -169,8 +153,8 @@ im2.save("/export/home/daifang/Diffusion/own_code/Figure/PTC_T.png")
 # from diffusers.utils import load_image
 # import torch
 
-# base_model_path = "/export/home/daifang/Diffusion/diffusers/model/sd-8_28"
-# controlnet_path = "/export/home/daifang/Diffusion/own_code/modelsaved/control_9-7_nd/checkpoint-17000/controlnet"
+# base_model_path = "../model/pretrainmodel"
+# controlnet_path = "../modelsaved/finetrainmodel/checkpoint-17000/controlnet"
 
 # controlnet = ControlNetModel.from_pretrained(controlnet_path, torch_dtype=torch.float16, use_safetensors=True)
 # pipe = StableDiffusionControlNetPipeline.from_pretrained(
@@ -183,17 +167,14 @@ im2.save("/export/home/daifang/Diffusion/own_code/Figure/PTC_T.png")
 
 # pipe.enable_model_cpu_offload()
 
-# control_image = load_image("/export/home/daifang/Diffusion/own_code/dataset/controlnet_condition_nd/condition_nd/20191101_094933_7.png")
+# control_image = load_image("../dataset/controlnet_condition_nd/condition_nd/20191101_094933_7.png")
 # prompt = "thyroid malignant solid clean irregular white points "
 
 # # generate image
 # generator = torch.manual_seed(0)
 # image = pipe(prompt, num_inference_steps=50, generator=generator, image=control_image).images[0]
 
-# image.save("/export/home/daifang/Diffusion/own_code/Figure/output_nd.png")
-
-
-
+# image.save("../Figure/outputfigure.png")
 
 
 # prompt ( or , optional) — The prompt or prompts to guide image generation. If not defined, you need to pass .strList[str]prompt_embeds
@@ -219,40 +200,5 @@ im2.save("/export/home/daifang/Diffusion/own_code/Figure/PTC_T.png")
 # guess_mode (, optional, defaults to ) — The ControlNet encoder tries to recognize the content of the input image even if you remove all prompts. A value between 3.0 and 5.0 is recommended.boolFalseguidance_scale
 # control_guidance_start ( or , optional, defaults to 0.0) — The percentage of total steps at which the ControlNet starts applying.floatList[float]
 # control_guidance_end ( or , optional, defaults to 1.0) — The percentage of total steps at which the ControlNet stops applying.floatList[float]
-
-
-
-
-# import torch
-# from PIL import Image
-# import torch
-# from diffusers import StableDiffusionPipeline, DPMSolverMultistepScheduler, DDIMScheduler
-# from diffusers import DiffusionPipeline
-# import torch
-# import os
-# import random
-
-# model_base = "/export/home/daifang/Diffusion/diffusers/model/sd-8_28"
-
-# pipe = DiffusionPipeline.from_pretrained(model_base, torch_dtype=torch.float16)
-# pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
-# pipe.to("cuda")
-# Dataset_classes =[  ["papillary","follicular","medullary"],
-#                     ["malignant","benign"],
-#                     ["solid","cystic","spongiform"],
-#                     ["wider-than-tall","taller-than-wide","circular"],
-#                     ["clear","unclear"],
-#                     ["irregular","regular"],
-#                     ["uneven echo", "even echo"],
-#                     ["low echo", "strong echo"],
-#                     ["white points", "no points"],
-#                     ["enormous nodes", "middle nodes","mini nodes"]]
-# for i in range(1,10):
-#     # i = 92232
-#     seed = random.randint(1,1000000)
-#     generator = torch.Generator().manual_seed(seed)
-#     prompt = "papillary,malignant"
-#     image = pipe(prompt, num_inference_steps=20, generator=generator, guidance_scale=6).images[0]
-#     draw = ImageDraw.Draw(image)
 #     draw.text((5, 5),  prompt,  fill = (255, 255, 255))
 #     image.save("/export/home/daifang/Diffusion/own_code/Figure/PTCtest/%s_%s_%s.png" % (i,seed,prompt.replace(" ","_").replace("(","").replace(")","").replace("[","").replace("]","")))
