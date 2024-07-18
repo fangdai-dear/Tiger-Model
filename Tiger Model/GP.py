@@ -9,14 +9,14 @@
 # from gtda.diagrams import Amplitude
 # from sklearn.metrics import pairwise_distances
 
-# # 设置图像处理转换
+
 # transform = transforms.Compose([
 #     transforms.Resize((256, 256)),
 #     transforms.ToTensor(),
 #     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 # ])
 
-# # 数据加载器
+
 # class ImageFolderDataset(Dataset):
 #     def __init__(self, folder_path, transform=None):
 #         self.file_paths = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.png')]
@@ -58,11 +58,11 @@
 #     gs_score = amplitude.fit_transform(diagrams)
 #     return gs_score.mean()
 
-# # 加载数据
-# generated_images_loader = load_data('/export/home/daifang/Diffusion/diffusers/figure/PTC_8-24')
-# real_images_loader = load_data('/export/home/daifang/Diffusion/diffusers/figure/PTC_8-12')
 
-# # 提取特征并计算分数
+# generated_images_loader = load_data('../figure/1')
+# real_images_loader = load_data('../figure/2')
+
+
 # generated_features = []
 # real_features = []
 
@@ -123,8 +123,8 @@
 #     return gs.item()
 
 # # Example usage
-# real_img_dir = '/export/home/daifang/Diffusion/own_code/GS/real'  # Replace with your real image directory
-# gen_img_dir = '/export/home/daifang/Diffusion/own_code/GS/fake'  # Replace with your generated image directory
+# real_img_dir = '../GS/real'  # Replace with your real image directory
+# gen_img_dir = '../GS/fake'  # Replace with your generated image directory
 
 # real_img_paths = [os.path.join(real_img_dir, fname) for fname in os.listdir(real_img_dir) if fname.endswith(('jpg', 'jpeg', 'png'))]
 # gen_img_paths = [os.path.join(gen_img_dir, fname) for fname in os.listdir(gen_img_dir) if fname.endswith(('jpg', 'jpeg', 'png'))]
@@ -180,13 +180,13 @@ def extract_features(img_paths, model):
 
 # Load the InceptionV3 model
 model = models.resnet18(pretrained=False)
-model.load_state_dict(torch.load('/export/home/daifang/Diffusion/Resnet/modelsaved/Thyroid_PTC+SD8000/e75_Thyroid_PTC+SD8000_V0.880T0.888.pth', map_location=lambda storage, loc: storage),strict=False)
+model.load_state_dict(torch.load('../Resnet/modelsaved/Thyroid_PTC+SD8000/e75_Thyroid_PTC+SD8000_V0.880T0.888.pth', map_location=lambda storage, loc: storage),strict=False)
 model.fc = nn.Identity()  # Remove the final classification layer
 model.eval()
 
 # Example usage
-real_img_dir = '/export/home/daifang/fairness/QuasiParerto/dataset/Thyroid/imageP/train/1'  # Replace with your real image directory
-gen_img_dir = '/export/home/daifang/fairness/QuasiParerto/dataset/Thyroid/imageP/valid/1'  # Replace with your generated image directory
+real_img_dir = '../dataset/Thyroid/imageP/train/1'  # Replace with your real image directory
+gen_img_dir = '../dataset/Thyroid/imageP/valid/1'  # Replace with your generated image directory
 
 real_img_paths = [os.path.join(real_img_dir, fname) for fname in os.listdir(real_img_dir) if fname.endswith(('jpg', 'jpeg', 'png'))]
 gen_img_paths = [os.path.join(gen_img_dir, fname) for fname in os.listdir(gen_img_dir) if fname.endswith(('jpg', 'jpeg', 'png'))]
@@ -209,44 +209,43 @@ print(metrics)
 # from clip import clip
 # import numpy as np
 
-# # 假设我们已经有了一个预训练的CLIP模型
+
 # clip_model, preprocess = clip.load("ViT-L/14@336px", device="cuda")
 
-# # 定义一个函数来获取图像的CLIP嵌入
+
 # def get_clip_embedding(images):
 #     with torch.no_grad():
 #         images = preprocess(images).unsqueeze(0).to("cuda")
 #         image_features = clip_model.encode_image(images)
 #     return image_features
 
-# # 定义一个函数来计算MMD距离
+
 # def compute_mmd(x, y, kernel):
-#     # 计算核矩阵
+
 #     xx = kernel(x, x)
 #     yy = kernel(y, y)
 #     xy = kernel(x, y)
-#     # 计算MMD距离
+
 #     mmd = torch.mean(xx) + torch.mean(yy) - 2 * torch.mean(xy)
 #     return mmd
 
-# # 定义高斯径向基函数核
 # def gaussian_rbf_kernel(x, y, sigma=1.0):
-#     # 计算平方距离
+
 #     dist = torch.cdist(x, y, p=2.0)
-#     # 计算高斯径向基函数核
+
 #     return torch.exp(-dist**2 / (2 * sigma**2))
 
-# # 假设我们有两个图像集合，一个是真实图像，另一个是生成的图像
-# real_images = ... # 真实图像的张量
-# generated_images = ... # 生成图像的张量
 
-# # 获取CLIP嵌入
+# real_images = ... 
+# generated_images = ... 
+
+
 # real_features = get_clip_embedding(real_images)
 # generated_features = get_clip_embedding(generated_images)
 
-# # 计算CMMD
-# sigma = 1.0  # 核函数的带宽参数
+
+# sigma = 1.0  
 # mmd = compute_mmd(real_features, generated_features, lambda x, y: gaussian_rbf_kernel(x, y, sigma))
-# cmmd = mmd * 1000  # 根据文章中的描述，将MMD值乘以1000进行缩放
+# cmmd = mmd * 1000  
 
 # print(f"CMMD: {cmmd.item()}")
