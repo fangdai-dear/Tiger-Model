@@ -180,13 +180,13 @@ def extract_features(img_paths, model):
 
 # Load the InceptionV3 model
 model = models.resnet18(pretrained=False)
-model.load_state_dict(torch.load('../Resnet/modelsaved/Thyroid_PTC+SD8000/e75_Thyroid_PTC+SD8000_V0.880T0.888.pth', map_location=lambda storage, loc: storage),strict=False)
+model.load_state_dict(torch.load('../modelsaved/Pretrained_InceptionV3.pth', map_location=lambda storage, loc: storage),strict=False)
 model.fc = nn.Identity()  # Remove the final classification layer
 model.eval()
 
 # Example usage
-real_img_dir = '../dataset/Thyroid/imageP/train/1'  # Replace with your real image directory
-gen_img_dir = '../dataset/Thyroid/imageP/valid/1'  # Replace with your generated image directory
+real_img_dir = '../dataset/1'  # Replace with your real image directory
+gen_img_dir = '../dataset/2'  # Replace with your generated image directory
 
 real_img_paths = [os.path.join(real_img_dir, fname) for fname in os.listdir(real_img_dir) if fname.endswith(('jpg', 'jpeg', 'png'))]
 gen_img_paths = [os.path.join(gen_img_dir, fname) for fname in os.listdir(gen_img_dir) if fname.endswith(('jpg', 'jpeg', 'png'))]
