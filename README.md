@@ -107,6 +107,18 @@ model , and employed the conditional control method similar to ControlNet but wi
 $ sh ./Tiger-Fine.sh
 ```
 
+
+## Trained Model Release: [Tiger]
+
+This repository contains the trained model for [Tiger] designed for [thyroid image generation]. The model was trained on [stable diffusion] using [PyTorch].
+
+## Model Details
+- **Model Architecture**: [stable-diffusion-v2]
+- **Input Size**: [224x224 for images]
+- **Output**: [image]
+- **Framework**: [PyTorch]
+- **Download Link 1**: [google drive link to download the Coarse-Training model](https://drive.google.com/file/d/1i5ZBvR5dxEf4Oe-bN51EyNymWW-0lrCG/view?usp=drive_link)]
+- **Download Link 2**: [google drive link to download the Fine-Training model](https://drive.google.com/file/d/14PzYy12BYQ5A_OCAGppO0QDzgJklYlhk/view?usp=drive_link)]
 ## Tiger Model Inference
 Tiger Model's application scenarios (inference) can be divided into two categories (Supplementary Fig.3). The first type is Diversify Inference, which involves generating thyroid feature textual prompts based on prompt input combinations. Tiger Model generates synthetic images based on the prompt content, controlling the synthesis of corresponding fine-grained foreground-background features within the model. The second type is Reference Inference, where the input comprises real images. Tiger Model generates images consistent with the subtype of the input image. Both generation scenarios allow for the control of corresponding foreground-background features as needed during the generation process. 
 ```sh
