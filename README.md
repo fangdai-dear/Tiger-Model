@@ -108,7 +108,7 @@ $ sh ./Tiger-Fine.sh
 ```
 
 
-## Trained Model Release: [Tiger]
+## Trained Model Release: **Tiger**
 
 This repository contains the trained model for **Tiger** designed for **thyroid image generation**. The model was trained on **stable diffusion** using **PyTorch**.
 
