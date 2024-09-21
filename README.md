@@ -143,4 +143,4 @@ We employ the [MoSo score](https://github.com/hrtan/MoSo) to control the quality
 All references are listed in the article.
 
 ## Licence
-The code can be used for non-commercial purposes after the publication of the article. 
+The code is distributed under the Apache License 2.0. It can be used for non-commercial purposes only after the publication of the article. For any commercial use, please contact the author for permission.
