@@ -119,7 +119,7 @@ This repository contains the trained model for **Tiger** designed for **thyroid 
 - **Input Size**: [224x224 for images]
 - **Output**: [image]
 - **Framework**: [PyTorch]
-- **Hugging Face Link**: [Hugging Face Link to download the code and model](https://huggingface.co/FangDai/Tiger-Model)
+- **Hugging Face Link**: [Hugging Face Link to download the code and model](https://huggingface.co/FangDai/Tiger-Model)-files and versions
 - **Google Drive Download Link 1**: [google drive link to download the Coarse-Training model](https://drive.google.com/file/d/1i5ZBvR5dxEf4Oe-bN51EyNymWW-0lrCG/view?usp=drive_link)
 - **Google Drive Download Link 2**: [google drive link to download the Fine-Training model](https://drive.google.com/drive/folders/1HnQiX4SD5K9S72nL4bafjkC5mDCahEqK?usp=drive_link)
   
