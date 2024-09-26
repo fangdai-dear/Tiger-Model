@@ -11,6 +11,8 @@ Artificial intelligence (AI) in oncology imaging struggles with diagnosing rare 
 ![figure1](https://github.com/fangdai-dear/Tiger-Model/blob/0fb783bf17ea4770e49f19f24ddd62ac973deff2/dataset/Figure1.png)
 COPYRIGHT NOTICE: This image is protected by copyright laws and is the property of [Fang Dai/Shanghai Jiao Tong University]. Unauthorized copying, distribution, or use of this image is strictly prohibited. All rights reserved.
 
+#### Both the code and models are available on GitHub, Hugging Face and Google Drive for ease of access.
+
 #### Research Status: Under Review
 
 ## Model architecture
@@ -117,8 +119,10 @@ This repository contains the trained model for **Tiger** designed for **thyroid 
 - **Input Size**: [224x224 for images]
 - **Output**: [image]
 - **Framework**: [PyTorch]
-- **Download Link 1**: [google drive link to download the Coarse-Training model](https://drive.google.com/file/d/1i5ZBvR5dxEf4Oe-bN51EyNymWW-0lrCG/view?usp=drive_link)]
-- **Download Link 2**: [google drive link to download the Fine-Training model](https://drive.google.com/drive/folders/1HnQiX4SD5K9S72nL4bafjkC5mDCahEqK?usp=drive_link)]
+- **Hugging Face Link**: [google drive link to download the Coarse-Training model](https://huggingface.co/FangDai/Tiger-Model/upload/main/model)]
+- **Google Drive Download Link 1**: [google drive link to download the Coarse-Training model](https://drive.google.com/file/d/1i5ZBvR5dxEf4Oe-bN51EyNymWW-0lrCG/view?usp=drive_link)]
+- **Google Drive Download Link 2**: [google drive link to download the Fine-Training model](https://drive.google.com/drive/folders/1HnQiX4SD5K9S72nL4bafjkC5mDCahEqK?usp=drive_link)]
+  
 
 ## Tiger Model Inference
 Tiger Model's application scenarios (inference) can be divided into two categories (Supplementary Fig.3). The first type is Diversify Inference, which involves generating thyroid feature textual prompts based on prompt input combinations. Tiger Model generates synthetic images based on the prompt content, controlling the synthesis of corresponding fine-grained foreground-background features within the model. The second type is Reference Inference, where the input comprises real images. Tiger Model generates images consistent with the subtype of the input image. Both generation scenarios allow for the control of corresponding foreground-background features as needed during the generation process. 
