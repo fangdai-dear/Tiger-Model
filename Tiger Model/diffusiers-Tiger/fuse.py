@@ -1,10 +1,29 @@
+# coding=utf-8
+# Copyright 2024 Hui Lu, Fang Dai, Siqiong Yao
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# This file includes modifications based on the original implementation from:
+# open-aff (2021),  available at:
+# https://github.com/YimianDai/open-aff
+
 import torch
 import torch.nn as nn
 
 
 class DAF(nn.Module):
     '''
-    直接相加 DirectAddFuse
+
     '''
 
     def __init__(self):
@@ -16,14 +35,14 @@ class DAF(nn.Module):
 
 class iAFF(nn.Module):
     '''
-    多特征融合 iAFF
+
     '''
 
     def __init__(self, channels=64, r=4):
         super(iAFF, self).__init__()
         inter_channels = int(channels // r)
 
-        # 本地注意力
+
         self.local_att = nn.Sequential(
             nn.Conv2d(channels, inter_channels, kernel_size=1, stride=1, padding=0),
             nn.BatchNorm2d(inter_channels),
@@ -32,7 +51,6 @@ class iAFF(nn.Module):
             nn.BatchNorm2d(channels),
         )
 
-        # 全局注意力
         self.global_att = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
             nn.Conv2d(channels, inter_channels, kernel_size=1, stride=1, padding=0),
@@ -42,7 +60,7 @@ class iAFF(nn.Module):
             nn.BatchNorm2d(channels),
         )
 
-        # 第二次本地注意力
+
         self.local_att2 = nn.Sequential(
             nn.Conv2d(channels, inter_channels, kernel_size=1, stride=1, padding=0),
             nn.BatchNorm2d(inter_channels),
@@ -50,7 +68,7 @@ class iAFF(nn.Module):
             nn.Conv2d(inter_channels, channels, kernel_size=1, stride=1, padding=0),
             nn.BatchNorm2d(channels),
         )
-        # 第二次全局注意力
+
         self.global_att2 = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
             nn.Conv2d(channels, inter_channels, kernel_size=1, stride=1, padding=0),
@@ -79,9 +97,7 @@ class iAFF(nn.Module):
 
 
 class AFF(nn.Module):
-    '''
-    多特征融合 AFF
-    '''
+
 
     def __init__(self, channels=64, r=4):
         super(AFF, self).__init__()
@@ -118,9 +134,7 @@ class AFF(nn.Module):
 
 
 class MS_CAM(nn.Module):
-    '''
-    单特征 进行通道加权,作用类似SE模块
-    '''
+
 
     def __init__(self, channels=64, r=4):
         super(MS_CAM, self).__init__()
