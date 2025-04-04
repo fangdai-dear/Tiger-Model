@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2024 Hui Lu, Fang Dai, Siqiong Yao.
+# Copyright 2024 Hui Lu, Fang Dai, Siqiong Yao
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# This file includes modifications based on the original implementation from:
+# clip-interrogator (2023), Diffusers Library, available at:
+# https://github.com/pharmapsychotic/clip-interrogator
+# The original code is licensed under the MIT License.
 
 
 """ PyTorch CLIP model."""
