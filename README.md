@@ -148,9 +148,11 @@ All references are listed in the article.
 ## Credits
 This library builds on many works, and its development wouldn't have been possible without their research and implementations. Special thanks to the following contributions that were crucial to our progress and the refinement of the API:
 
-@Patrick von Platen.et al's diffusion library called diffusers, available [here](https://github.com/huggingface/diffusers)
-@Robin Rombach.et al's stable-diffusion model, available [here](https://github.com/CompVis/stable-diffusion)
-@Lvmin Zhang, Anyi Rao, and Maneesh Agrawala's ControlNet model, available [here](https://huggingface.co/papers/2302.05543)
+Many original implementation are from diffusion library called diffusers, available [here](https://github.com/huggingface/diffusers)
+Robin Rombach.et al's stable-diffusion model, available [here](https://github.com/CompVis/stable-diffusion)
+Lvmin Zhang, Anyi Rao, and Maneesh Agrawala's ControlNet model, available [here](https://huggingface.co/papers/2302.05543)
+YimianDai's Fusion module, available [here](https://github.com/YimianDai/open-aff)
+pharmapsychotic's CLIP model, available [here](https://github.com/pharmapsychotic/clip-interrogator)
 
 ## Licence
 The code is distributed under the Apache License 2.0. It can be used for non-commercial purposes only after the publication of the article. For any commercial use, please contact the author for permission.
