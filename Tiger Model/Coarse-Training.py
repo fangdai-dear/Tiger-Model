@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# This file includes modifications based on the original implementation from:
-# HuggingFace Inc. (2023), Diffusers Library, available at:
-# https://github.com/huggingface/diffusers
+# This file includes modifications based on the original implementation of:
+# Stable Diffusion (SD), available at:
+# https://github.com/CompVis/stable-diffusion
 # The original code is licensed under the Apache License, Version 2.0.
 
 
