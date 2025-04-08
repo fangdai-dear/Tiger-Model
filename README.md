@@ -148,7 +148,7 @@ All references are listed in the article.
 ## Credits
 This library builds on many works, and its development wouldn't have been possible without their research and implementations. Special thanks to the following contributions that were crucial to our progress and the refinement of the API:
 
-Many original implementation are from diffusion library called diffusers, available [here](https://github.com/huggingface/diffusers)\n
+Many original implementation are from diffusion library called diffusers, available [here](https://github.com/huggingface/diffusers)
 Robin Rombach.et al's stable-diffusion model, available [here](https://github.com/CompVis/stable-diffusion)
 Lvmin Zhang, Anyi Rao, and Maneesh Agrawala's ControlNet model, available [here](https://huggingface.co/papers/2302.05543)
 @bobo0810's Fusion module, available [here](https://github.com/YimianDai/open-aff)
