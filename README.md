@@ -155,4 +155,4 @@ Lvmin Zhang, Anyi Rao, and Maneesh Agrawala's ControlNet model, available [here]
 pharmapsychotic's CLIP model, available [here](https://github.com/pharmapsychotic/clip-interrogator)
 
 ## Licence
-The code is distributed under the Apache License 2.0. It can be used for non-commercial purposes only after the publication of the article. For any commercial use, please contact the author for permission.
+The code is distributed under the Apache License 2.0. For any commercial use, please contact the author for permission.
